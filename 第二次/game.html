@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>game 1</title>
+        <style>
+            canvas {
+                border: 1px black solid;
+            }
+        </style>
+        <script src = 'utils.js'></script>
+        <script src = 'guagame.js'></script>
+        <script src = 'paddle.js'></script>
+        <script src = 'ball.js'></script>
+        <script src = 'block.js'></script>
+        <script src = 'level.js'></script>
+    </head>
+    <body>
+        <canvas id="id-canvas" width="400" height="300"></canvas>
+        <hr>
+        <input id="id-input-speed" type="range" value="1"> 
+<script>
+
+var loadLevel = function(n) {
+    n -= 1
+    var level = levels[n]
+    var blocks = []
+    for(var i = 0; i < level.length; i++) {
+        var p = level[i]
+        var b = Block(p)
+        blocks.push(b)
+    }
+    return blocks
+}
+//全局变量
+var blocks = []
+
+var enableDebugMode = function(enable) {
+    if(!enable) {
+        return 
+    }
+    window.paused = false
+    window.addEventListener('keydown', function(event){
+        var k = event.key
+        if(k == 'p') {
+            window.paused = !(window.paused)
+        }else if ('1234567'.includes(k)) {
+            //全局变量
+            blocks = loadLevel(Number(k))
+        }
+
+    })
+    //控制速度
+    document.querySelector('#id-input-speed').addEventListener('input', function(event){
+        var input = event.target
+        window.fps = Number(input.value)
+    })
+}
+var __main = function() {
+    enableDebugMode(true)
+
+    var game = GuaGame(30)
+
+    var paddle = Paddle()
+     
+
+    var ball = Ball()
+
+    //全局变量
+    blocks = loadLevel(1)
+
+
+    game.registerAction('a', function(){
+        paddle.moveLeft()
+    })
+    game.registerAction('d', function(){
+        paddle.moveRight()
+    })
+    game.registerAction('f', function(){
+        ball.fire()
+    })
+    
+    game.update = function() {
+        if(window.paused){
+            return 
+        }
+        ball.move()
+        //判断 paddle 和 ball 相撞
+        if (paddle.collide(ball)) {
+           
+            ball.rebound()
+        }
+        //判断 ball 和 blocks 相撞
+        for(var i = 0; i < blocks.length; i++) {
+            var block = blocks[i]
+            if(block.collide(ball)) {
+                block.kill()
+                ball.rebound()
+            }
+        }
+       
+    }
+    game.draw = function() {
+        
+        game.drawImage(paddle)
+        game.drawImage(ball)
+        for(var i = 0; i < blocks.length; i++) {
+            var block = blocks[i]
+            if (block.alive) {
+                game.drawImage(block)        
+            }
+        }
+        
+    }
+    
+}
+__main()
+
+</script>
+    </body>
+</html>
