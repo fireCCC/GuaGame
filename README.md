@@ -18,6 +18,6 @@ This is a Guagame
 <font color=#0099ff>[第十四次-马里奥-demo 人物移动](http://wantsuchen.top/Guagame/%E7%AC%AC%E5%8D%81%E5%9B%9B%E6%AC%A1/game.html)</font>
 <font color=#0099ff>[第十六次-马里奥-demo ](http://wantsuchen.top/Guagame/%E7%AC%AC%E5%8D%81%E5%85%AD%E6%AC%A1/game.html)</font>
 <br>
-第十八次预览图
+第十八次预览图<br>
 ![第十八次预览图](https://github.com/fireCCC/Guagame/blob/master/%E9%A2%84%E8%A7%88%E5%9B%BE/%E7%AC%AC%E5%8D%81%E5%85%AB%E6%AC%A1%E9%A2%84%E8%A7%88%E5%9B%BE.png)
 
