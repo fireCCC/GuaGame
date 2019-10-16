@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>guario map editor</title>
+    <style>
+      div {
+        outline: dashed lightskyblue 1px;
+      }
+      canvas {
+        border: lightskyblue 1px dashed;
+      }
+      * {
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas
+      id="id-canvas"
+      data-action="draw_tile"
+      width="512"
+      height="480"
+    ></canvas>
+    <div class="gua-inline-block">
+      <img
+        data-action="change_active_tile"
+        src="tiles/t1.png"
+        alt=""
+        data-id="1"
+      />
+      <img
+        data-action="change_active_tile"
+        src="tiles/t2.png"
+        alt=""
+        data-id="2"
+      />
+      <img
+        data-action="change_active_tile"
+        src="tiles/t3.png"
+        alt=""
+        data-id="3"
+      />
+      <img
+        data-action="change_active_tile"
+        src="tiles/t4.png"
+        alt=""
+        data-id="4"
+      />
+    </div>
+    <div class="gua-controls">
+      <button data-action="change_offset" data-offset="-1024">-1024</button>
+      <button data-action="change_offset" data-offset="-16">-16</button>
+      <button data-action="change_offset" data-offset="16">16</button>
+      <button data-action="change_offset" data-offset="1024">1024</button>
+      <button data-action="clear_tile" data-selector="id-canvas-tile">
+        清空 tile
+      </button>
+    </div>
+    <h3>#5080ff</h3>
+  </body>
+  <script>
+    const e = sel => document.querySelector(sel);
+
+    const log = console.log.bind(console);
+
+    const actions = {
+      change_active_tile(event) {
+        let id = Number(event.target.dataset.id);
+        log("active tile", id);
+        window.activeTile = event.target;
+      },
+      draw_tile(event) {
+        let target = event.target;
+        let rect = target.getBoundingClientRect();
+        let x = event.clientX - rect.left;
+        let y = event.clientY - rect.top;
+        let tileSize = 32;
+        let i = Math.floor(x / tileSize);
+        let j = Math.floor(y / tileSize);
+        let x1 = i * tileSize;
+        let y1 = j * tileSize;
+        // window.context.fillStyle = '#5080FF';
+        window.context.fillRect(x1, y1, tileSize, tileSize);
+        log(window.activeTile, x1, y1);
+        window.context.drawImage(window.activeTile, x1, y1);
+      }
+    };
+
+    const tilePosition = (x, y) => {
+      let tileSize = 32;
+      let i = Math.floor(x / tileSize);
+      let j = Math.floor(y / tileSize);
+      let x1 = i * tileSize;
+      let y1 = j * tileSize;
+      return [x1, y1];
+    };
+
+    const drawTileAt = (x, y) => {
+      let tileSize = 32;
+      let [x1, y1] = tilePosition(x, y);
+      window.context.fillRect(x1, y1, tileSize, tileSize);
+      window.context.drawImage(window.activeTile, x1, y1);
+      //FIXME 暂时这么写
+      let mx = x1 / tileSize;
+      let my = y1 / tileSize;
+      let tileId = Number(window.activeTile.dataset.id);
+      window.map.setTile(mx, my, tileId);
+    };
+
+    const bindEvents = () => {
+      e("body").addEventListener("click", event => {
+        let action = event.target.dataset.action;
+        actions[action] && actions[action](event);
+      });
+      //鼠标拖动
+      let moving = false;
+      window.canvas.addEventListener("mousedown", event => {
+        moving = true;
+        let x = event.clientX;
+        let y = event.clientY;
+        drawTileAt(x, y);
+      });
+      window.canvas.addEventListener("mousemove", event => {
+        if (moving) {
+          let x = event.clientX;
+          let y = event.clientY;
+          drawTileAt(x, y);
+        }
+      });
+      window.canvas.addEventListener("mouseup", event => {
+        moving = false;
+      });
+    };
+    const init = () => {
+      window.map = new Map();
+      window.activeTile = null;
+      window.canvas = e("canvas");
+      window.context = window.canvas.getContext("2d");
+      window.context.fillStyle = "#5080FF";
+      window.context.fillRect(0, 0, 1000, 1000);
+    };
+
+    class Map {
+        constructor() {
+            this.width = 20;
+            this.height = 15;
+            this.tiles = []
+            this.setupTiles();
+        };
+        setupTiles() {
+            let s = this.width * this.height;
+            for (let i = 0; i < s; i++) {
+                this.tiles[i] = 0;   
+            }
+        };
+        setTile(i, j, tileId) {
+            let index = i * this.height + j;
+            this.tiles[index] = tileId; 
+            log(i, j, this.tiles[index]);
+        }
+    }
+    const _main = () => {
+      init();
+      bindEvents();
+    };
+
+    _main();
+  </script>
+</html>
